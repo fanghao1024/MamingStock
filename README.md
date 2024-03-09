@@ -1,5 +1,5 @@
 ### pythonstock V2 项目简介
-基于https://github.com/pythonstock/stock的项目进行开发
+基于https://github.com/pythonstock/stock  的项目进行开发
 
 所做的改动有，改动幅度超过原项目的一半：
 
