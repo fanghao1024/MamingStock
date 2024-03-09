@@ -1,5 +1,6 @@
 ### pythonstock V2 项目简介
 基于https://github.com/pythonstock/stock的项目进行开发
+
 所做的改动有：
     1.对于抓取数据的种类进行了扩展
     2.增加了技术分析的种类，以及分析图像的展示方式
