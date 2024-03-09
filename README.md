@@ -1,13 +1,13 @@
 ### pythonstock V2 项目简介
 基于https://github.com/pythonstock/stock的项目进行开发
 
-所做的改动有：
+所做的改动有，改动幅度超过原项目的一半：
     1.对于抓取数据的种类进行了扩展
     2.增加了技术分析的种类，以及分析图像的展示方式
-    3.增加了点数图的展示
+    3.增加了点数图的展示,对其他的生成图像展示也进一步做了优化
     4.为后续加入各种机器学习方法和强化学习方法扩展了接口
 
-以下内容为原项目的readme
+
 ```
 项目地址：https://github.com/pythonstock/stock
 PythonStock V2 是基于Python的pandas，akshare，bokeh，tornado，stockstats，ta-lib等框架开发的全栈股票系统。
