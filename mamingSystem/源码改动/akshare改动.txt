@@ -1,0 +1,1 @@
+20210427 D:\Anaconda3\envs\backtrader\Lib\site-packages\akshare\stock zh_stock_a_sina.py 增加一行 data_df["date"] = data_df["date"].astype('datetime64[ns]')
