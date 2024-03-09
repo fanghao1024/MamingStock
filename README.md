@@ -1,8 +1,12 @@
 ### pythonstock V2 项目简介
+基于https://github.com/pythonstock/stock的项目进行开发
+所做的改动有：
+    1.对于抓取数据的种类进行了扩展
+    2.增加了技术分析的种类，以及分析图像的展示方式
+    3.增加了点数图的展示
+    4.为后续加入各种机器学习方法和强化学习方法扩展了接口
 
-
-**特别说明：股市有风险投资需谨慎，本项目只能用于Python代码学习，股票分析，投资失败亏钱不负责，不算BUG。**
-
+以下内容为原项目的readme
 ```
 项目地址：https://github.com/pythonstock/stock
 PythonStock V2 是基于Python的pandas，akshare，bokeh，tornado，stockstats，ta-lib等框架开发的全栈股票系统。
@@ -79,70 +83,8 @@ CCI
 | 17, VR，MAVR指标     | http://wiki.mbalib.com/wiki/%E6%88%90%E4%BA%A4%E9%87%8F%E6%AF%94%E7%8E%87   成交量比率（Volumn Ratio，VR）（简称VR），是一项通过分析股价上升日成交额（或成交量，下同）与股价下降日成交额比值， 从而掌握市场买卖气势的中期技术指标。 |
 
 
-### 使用方法（依赖docker）
-
-使用 mariadb 和 stock 两个镜像
-
-```
-mkdir -p /data/mariadb/data
-docker pull pythonstock/pythonstock:latest
-docker pull mariadb:latest
-
-docker run --name mariadb -v /data/mariadb/data:/var/lib/mysql \
-    -e MYSQL_ROOT_PASSWORD=mariadb -p 3306:3306 -d mariadb:latest
-
-docker run -itd --link=mariadb --name stock  \
-    -v /data/notebooks:/data/notebooks \
-    -p 8888:8888 \
-    -p 9999:9999 \
-    pythonstock/pythonstock:latest
-
-```
-
-直接启动stock ，使用其他 mysql 数据库，需要配置变量方式：
-
-```
-docker run -itd --name stock  \
-    -v /data/notebooks:/data/notebooks \
-    -p 8888:8888 \
-    -p 9999:9999 \
-    -e MYSQL_HOST=127.0.0.1 \
-    -e MYSQL_USER=root \
-    -e MYSQL_PWD=mariadb \
-    -e MYSQL_DB=stock_data \
-    pythonstock/pythonstock:latest
-```
-
-或者使用docker compose
-
-安装docker-compose
-https://www.runoob.com/docker/docker-compose.html
-
-```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-```
-
-```
-docker-compose up -d
-```
-
-要想修改文件进行调试，增加当前目录映射，加入到stock里面：
-```yaml
-        volumes:
-            - "./jobs:/data/stock/jobs"
-            - "./libs:/data/stock/libs"
-            - "./web:/data/stock/web"
-```
-
-进入镜像：
-```
-docker exec -it stock bash 
-sh /data/stock/jobs/cron.daily/run_daily
-```
-
-说明，启动容器后，会调用。run_init.sh 进行数据初始化，同时第一次执行后台执行当日数据。
-以后每日18点（只有18点左右才有今日的数据）进行股票数据抓取并计算。
+### 使用方法
+首先需要打开mysql服务，然后运行web文件夹下面的main.py
 
 
 ### 本地访问端口
@@ -196,165 +138,6 @@ http://docs.sqlalchemy.org/en/latest/core/reflection.html
 
 ## 更新日志
 
-### 15 发布一个 2.0 的版本 - 2021-10-11
 
-构建基础版本 pythonstock/pythonstock:base-2021-09 在这个镜像的基础上使用 akshare 1.1.9
-折腾几个月，终于把2.0 弄好了，为啥弄2.0 因为之前发现 tushare的数据不能抓取了。需要注册成 pro 版本，但是pro 还有积分限制。
-诸多不便吧，于是换成了 akshare 库了，大改了，需要找到相关的新库。然后在些代码。
-删除掉了 ta-lib 安装了之后从来没有用到，jupyter 也是没有用。占空间影响下载心情。将镜像进一步减小。
-
-
-### 14 bokeh 升级到 2.4.0 版本
-
-目录
-/usr/local/lib/python3.7/site-packages
-使用脚本进行升级。
-
-### 13 升级ak到v1.0.80 做好每日东方财经数据
-
-https://www.akshare.xyz/zh_CN/latest/data/stock/stock.html#id1
-限量: 单次返回所有 A 股上市公司的实时行情数据
-
-600开头的股票是上证A股，属于大盘股，其中6006开头的股票是最早上市的股票，
-6016开头的股票为大盘蓝筹股；900开头的股票是上证B股；
-000开头的股票是深证A股，001、002开头的股票也都属于深证A股，
-其中002开头的股票是深证A股中小企业股票；200开头的股票是深证B股；
-300开头的股票是创业板股票；400开头的股票是三板市场股票。
-
-过滤包括：600，6006，601，000，001，002，且不包括ST的股票数据。
-
-增加数据库utf8 参数 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci 
-
-
-### 12 升级基础镜像到3.7 python，保障 akshare 0.6.10 以上版本支持
-
-发现 akshare 要求升级python 3.7 以上版本才可以，需要升级基础镜像。
-然后 akshare 就可以升级到 0.9.65 的最新版本了。
-新版本就可以按照日期进行查询，解决 TypeError: stock_zh_a_daily() got an unexpected keyword argument 'start_date' 这个问题了。
-
-
-### 11 使用 akshare 做相关股票数据抓取
-
-	
-中国的股市开盘时间为：每周一至周五的上午9:30——11：30，
-下午13:00——15:00。中国股市收盘时间为：每周一至周五的下午3点。
-
-实时行情数据
-接口: stock_zh_a_spot
-目标地址: http://vip.stock.finance.sina.com.cn/mkt/#hs_a
-描述: A 股数据是从新浪财经获取的数据, 重复运行本函数会被新浪暂时封 IP, 建议增加时间间隔
-限量: 单次返回所有 A 股上市公司的实时行情数据
-
-历史行情数据
-日频率
-接口: stock_zh_a_daily
-目标地址: https://finance.sina.com.cn/realstock/company/sh600006/nc.shtml(示例)
-描述: A 股数据是从新浪财经获取的数据, 历史数据按日频率更新; 注意其中的 sh689009 为 CDR, 请 通过 stock_zh_a_cdr_daily 接口获取
-限量: 单次返回指定 A 股上市公司指定日期间的历史行情日频率数据
-
-### 10 增加东方财经弹窗窗口、增加指标计算弹窗窗口
-
-发现了一个东方财富的页面，是给pc端用的。
-可以做个弹出框放到系统中。不进行调整了，长宽高可以做的小点。使用iframe引入界面。否则有跨域和样式问题。
-
-修改指标页面，改成窗口弹窗，做页面适配，方便查看。
-
-### 9，增加日历
-
-```
-古老的jquery 代码：
-		$( ".date-picker" ).datepicker({
-			language: 'zh-CN', //设置语言
-            format:"yyyymmdd",
-            showOtherMonths: true,
-            selectOtherMonths: false,
-            autoclose: true,
-			todayHighlight: true
-        });
-针对日期类型的搜索条件增加日历
-
-```
-
-https://www.bootcss.com/p/bootstrap-datetimepicker/
-不是使用jQuery的时间。
-
-### 8，发现MariaDb 版本不兼容问题，最后切换成mysql,使用 mysql:5.7 镜像
-
-相关数据执行只支持到10.5.4，版本可以使用，但是10.5.8 就有问题了。
-限制死了版本。看来软件也不能瞎升级，都用最新的有问题。可以解决数据问题。
-使用 mysql:5.7 镜像，更通用些，不折腾mariaDb了。
-
-
-### 7，解决 Bokeh JS兼容问题。
-
-> 升级 bokeh 到 2.1.1 版本
->
-> https://pypi.org/project/bokeh/#files
-> 
-> 升级JS，因为 lib 包升级导致问题。
-
-
-
-### 6，升级 bokeh 到 2.1.1 版本
-
-```
-
-https://pypi.org/project/bokeh/#files
-
-```
-
-### 5，解决日志打印问题
-
-```
-
-配置 main.py 
-tornado.options.parse_command_line()
-
-然后启动配置参数：
-/usr/local/bin/python3 /data/stock/web/main.py -log_file_prefix=/data/logs/web.log
-
-```
-
-### 4，解决跑数据问题
-
-```
-# 通过数据库链接 engine。
-def conn():
-    try:
-        db = MySQLdb.connect(MYSQL_HOST, MYSQL_USER, MYSQL_PWD, MYSQL_DB, charset="utf8")
-        # db.autocommit = True
-    except Exception as e:
-        print("conn error :", e)
-    db.autocommit(on=True)
-    return db.cursor()
-```
-
-之前升级过代码，造成 db.cursor() 问题。
-
-### 3，增加多字段排序
-
-> 1，点击是单个字段进行排序。
->
-> 2，按照【shift】，点击多个，即可完成多字段排序。
-> 
-> 3，服务端分页排序。
->
-> 4，按照多个字段进行筛选查询。
-
-### 2，使用pandas处理重复数据
-
-https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop_duplicates.html
-
-```python
-    data = get_data(year, quarter)
-    # 处理重复数据，保存最新一条数据。
-    data.drop_duplicates(subset="code", keep="last")
-```
-
-### 1，web使用datatable显示报表
-
-通用数据配置，在 libs/stock_web_dic.py 配置数据之后，可以实现动态加载菜单，根据数据库表的行列显示数据。
-
-不用一个表一个表进行开发，通用数据展示。
 
 
